@@ -19,3 +19,5 @@ supported extension: `jpeg` only.
 ```bash
 ./remove_bg input.jpeg output.png
 ```
+Use with image that have a green background!.
+this tools is not serious, i'm just bored and still under development.
