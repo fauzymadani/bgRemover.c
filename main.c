@@ -7,37 +7,34 @@ using namespace cv;
 
 void removeBackgroundWithGreenscreen(const char *inputImage,
                                      const char *outputImage) {
-  // Baca gambar
+  // read image
   Mat img = imread(inputImage);
   if (img.empty()) {
-    printf("Gagal membaca gambar: %s\n", inputImage);
+    printf("Could not read image: %s\n", inputImage);
     return;
   }
 
-  // Konversi ke HSV
+  // convert to HSV
   Mat hsvImg;
   cvtColor(img, hsvImg, COLOR_BGR2HSV);
 
-  // Buat mask untuk warna hijau (greenscreen)
+  // masking for green color
   Mat mask;
   inRange(hsvImg, Scalar(35, 50, 50), Scalar(85, 255, 255), mask);
 
-  // Perbaiki mask dengan operasi morfologi (dilate dan erode)
   Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(5, 5));
-  morphologyEx(mask, mask, MORPH_CLOSE, kernel); // Mengisi area kecil
-  morphologyEx(mask, mask, MORPH_OPEN, kernel);  // Menghilangkan noise kecil
+  morphologyEx(mask, mask, MORPH_CLOSE, kernel); // fill space
+  morphologyEx(mask, mask, MORPH_OPEN, kernel);  // remove noise
 
-  // Balik mask (objek utama menjadi putih, background hitam)
   bitwise_not(mask, mask);
 
-  // Terapkan mask ke gambar asli
+  // implement mask to the image
   Mat result;
   img.copyTo(result, mask);
 
-  // Simpan hasil
+  // save result
   imwrite(outputImage, result);
-  printf("Background dihapus dengan greenscreen. Gambar disimpan ke: %s\n",
-         outputImage);
+  printf("completed. save changes to: %s\n", outputImage);
 }
 
 int main(int argc, char **argv) {
@@ -49,4 +46,3 @@ int main(int argc, char **argv) {
   removeBackgroundWithGreenscreen(argv[1], argv[2]);
   return 0;
 }
-
